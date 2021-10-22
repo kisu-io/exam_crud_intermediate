@@ -89,8 +89,6 @@ jobController.createJob = (req, res, next) => {
     next(error);
   }
 };
-
-
 jobController.updateJobById = (req, res, next) => {
   const { id } = req.params;
 
@@ -118,7 +116,6 @@ jobController.updateJobById = (req, res, next) => {
     next(error);
   }
 };
-
 jobController.deleteJobById = (req, res, next) => {
   try {
     const { id } = req.params;
@@ -137,4 +134,5 @@ jobController.deleteJobById = (req, res, next) => {
     next(error);
   }
 };
+
 module.exports = jobController;

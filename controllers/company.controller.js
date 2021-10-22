@@ -6,23 +6,24 @@ companyController.getAllCompanies = (req, res, next) => {
     const { page, city, sortBy, order} = req.query;
     const requestPage = parseInt(page) || 1;
     const limit = 20;
-  
+    console.log("Received get request");
+    console.log(req.query);
     try {
       const rawData = fs.readFileSync("data.json", "utf8");
       const data = JSON.parse(rawData);
       let companyList = data.companies;
       let jobsList = data.jobs;
-      let result;
+      let result = companyList;
+      console.log(result);
       if(city) {
         let cityList = city.split(","); // ["Miami", "New York"]
         let cityJobList = jobsList.filter(item => cityList.includes(item.city)).map(item => {return item.companyId})
         console.log(cityJobList);
-        result = companyList.filter(item => cityJobList.includes(item.id));
-        console.log(result);
+        result = result.filter(item => cityJobList.includes(item.id));
       }
       
       if(sortBy && sortBy === "ratings") {
-        let companyRatingList = companyList.map(item => {
+          result = result.map(item => {
           let companyRatings = data.ratings.filter(ratingItem => item.ratings.includes(ratingItem.id));
           let averageRating = 0;
           companyRatings.forEach(i => 
@@ -32,22 +33,21 @@ companyController.getAllCompanies = (req, res, next) => {
           averageRating = averageRating/item.numOfRatings;
             return {...item, averageRating};
         })
-        let sortedList = companyRatingList.sort((a,b) => {
+        result = result.sort((a,b) => {
           if(order === 'desc') {
             return b.averageRating - a.averageRating;
           } 
           return a.averageRating - b.averageRating;
         })
-        result = sortedList;
       }
+        console.log(result.length);
         result = result.slice((requestPage - 1) * limit, requestPage * limit);
-        console.log(companyList.length)
+        
         return res.status(200).send(result);
     } catch (error) {
       next(error);
     }
   };
-
 
 
 companyController.createCompany = (req, res, next) => {
@@ -115,7 +115,7 @@ companyController.updateCompanyById = (req, res, next) => {
     }
   };
 
-  companyController.deleteCompanyById = (req, res, next) => {
+companyController.deleteCompanyById = (req, res, next) => {
     try {
       const { id } = req.params;
       const rawData = fs.readFileSync("data.json", "utf8");
